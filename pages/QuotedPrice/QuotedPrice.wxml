@@ -1,0 +1,222 @@
+<!-- 印刷报价器 -->
+<view class='container-fluid'>
+  <view class='container'>
+    <view class='inner-box'>
+      <!-- 顶部 -->
+      <view class='item-box'>
+        <view class="item info">
+          <text>
+            订单状态：{{order.state}}
+          </text>
+          <text>
+            {{order.time}}
+          </text>
+        </view>
+        <view class="item mainNumber">
+          主订单号：
+          {{order.mainOrder}}
+        </view>
+        <!-- 输入框 -->
+        <label class='label'>
+          <view class='text'>
+          客户名称:
+          </view> 
+          <input 
+          focus='true'
+          confirm-type='done'
+          placeholder='请输入客户名称'
+          type='text'>
+          
+          </input>
+        </label>
+        <label class='label'>
+          <view class='text'>
+          联系人:
+          </view>  
+          <input 
+          confirm-type='done'
+          placeholder='请输入联系人'
+          type='text'>
+          
+          </input>
+        </label>
+        <label class='label'>
+          <view class='text'>
+          电话:
+          </view>  
+          <input 
+          confirm-type='done'
+          type='digit'
+          maxlength='11'
+          placeholder='请输入电话'
+          type='text'>
+          
+          </input>
+        </label>
+        <label class='label'>
+          <view class='text'>
+          咨询备注:
+          </view> 
+          <textarea 
+          confirm-type='done'
+          cursor-spacing="20"
+          placeholder='请输入您要咨询的问题'>
+          
+          </textarea>
+        </label>
+      </view>
+      <!-- 子订单 -->
+      <view class='children-order'>
+        <view class='c-order-number'>
+          子订单号：
+          {{order.childrenOrder}}
+        </view>
+        <text class='children-title'>
+          工艺选择
+        </text>
+        <checkbox-group
+        class='group'
+        bindchange="technicSelect"
+        >
+          
+          <label 
+          wx:for="{{order.technics}}"
+          wx:for-item="item"
+          wx:for-index='idx'
+          wx:key="order.technics.text"
+          >
+          {{item.text}}
+          <checkbox 
+          value='{{item.text}}'
+          checked='{{item.checked}}'>
+          </checkbox>
+          </label>
+        </checkbox-group>
+      </view>
+    </view>
+  </view>
+
+  <!-- 图文制作费 -->
+  <view class="check-container">
+    <view class='check-contain'>
+      <checkbox-group>
+        <label class='checked-box'>
+          <checkbox
+            checked='{{picther.checked}}'
+          >
+            {{picther.title}}
+          </checkbox>
+        </label>
+      </checkbox-group>
+
+      <!-- picker -->
+      <view class='contain-detail'>
+        <picker 
+            class='picker'
+            bindchange="bindPickerChange" 
+            value="{{index}}" 
+            range="{{picther.option}}">
+          <view class="picker-value">
+            当前选择：
+            <input
+              disabled='true'
+              value='{{picther.selected}}'
+            >
+            </input>
+          </view>
+        </picker>
+      </view>
+      <!-- 输入框 -->
+      <view class='contain-input'>
+        <view class='item'>
+          单价 ：
+          <input
+            maxlength='6'
+            type='digit'
+          >
+          </input>
+        </view>
+        <view class='item'>
+          数量 ：
+          <input
+            maxlength='6'
+            type='digit'
+          >
+          </input>
+        </view>
+        <view class='item'>
+          小计 ：
+          <input
+            maxlength='6'
+            type='digit'
+          >
+          </input>
+        </view>
+      </view>
+      
+     
+      
+
+    </view>
+  </view>
+  <!-- 材料费 -->
+  <view class="check-container">
+    <view class='check-contain'>
+      <checkbox-group>
+        <label class='checked-box'>
+          <checkbox
+            checked='{{picther.checked}}'
+          >
+            {{picther.title}}
+          </checkbox>
+        </label>
+      </checkbox-group>
+
+      <!-- picker -->
+      <view class='contain-detail'>
+        <picker 
+            class='picker'
+            bindchange="bindPickerChange" 
+            value="{{index}}" 
+            range="{{picther.option}}">
+          <view class="picker-value">
+            当前选择：
+            <input
+              disabled='true'
+              value='{{picther.selected}}'
+            >
+            </input>
+          </view>
+        </picker>
+      </view>
+      <!-- 输入框 -->
+      <view class='contain-input'>
+        <view class='item'>
+          单价 ：
+          <input
+            maxlength='6'
+            type='digit'
+          >
+          </input>
+        </view>
+        <view class='item'>
+          数量 ：
+          <input
+            maxlength='6'
+            type='digit'
+          >
+          </input>
+        </view>
+        <view class='item'>
+          小计 ：
+          <input
+            maxlength='6'
+            type='digit'
+          >
+          </input>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+</view>

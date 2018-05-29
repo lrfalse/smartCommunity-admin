@@ -1,0 +1,44 @@
+{
+  "pages": [
+    "pages/Quotation_clerk/Quotation_clerk", 
+    "pages/Supplier/Supplier",
+    "pages/Designer/Designer",
+    "pages/User_center/User_center",
+    
+
+    "pages/QuotedPrice/QuotedPrice",
+    "pages/Quoted/Price/Price",
+    "pages/index/index",
+    "pages/logs/logs"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#333",
+    "selectedColor": "#ff9800",
+    "backgroundColor": "#fff",
+    "borderStyle": "#ff9800",
+    "list": [
+      {
+        "pagePath": "pages/Quotation_clerk/Quotation_clerk",
+        "text": "报价员"
+      },
+      {
+        "pagePath": "pages/Supplier/Supplier",
+        "text": "供应商"
+      },
+      {
+        "pagePath": "pages/Designer/Designer",
+        "text": "设计员"
+      },
+      {
+        "pagePath": "pages/User_center/User_center",
+        "text": "个人中心"
+      }
+    ]
+  }
+}
