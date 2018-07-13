@@ -11,33 +11,33 @@
          class="demo-ruleForm">
             <el-form-item 
                 label="公司全称" 
-                prop="user_name">
+                prop="propertyName">
                 <el-input 
-                    v-model="formData.user_name" 
+                    v-model="formData.propertyName" 
                     placeholder="请输入用户姓名">
                 </el-input>
             </el-form-item>
             <el-form-item 
                 label="公司简称" 
-                prop="user_phone">
+                prop="propertyShortname">
                 <el-input 
-                    v-model="formData.user_phone" 
+                    v-model="formData.propertyShortname" 
                     placeholder="请输入用户电话">
                 </el-input>
             </el-form-item>
             <el-form-item 
                 label="联系人姓名" 
-                prop="user_number">
+                prop="name">
                 <el-input 
-                    v-model="formData.user_number" 
+                    v-model="formData.name" 
                     placeholder="请输入用户账号">
                 </el-input>
             </el-form-item>
             <el-form-item 
                 label="联系人电话" 
-                prop="user_password">
+                prop="phone">
                 <el-input 
-                    v-model="formData.user_password" 
+                    v-model="formData.phone" 
                     placeholder="请输入用户密码">
                 </el-input>
             </el-form-item>
@@ -106,16 +106,8 @@
                 button_switch: true,
                 clear_array: false,
                 updata_checked: [],  // 编辑 传入的 多选
-                formData: {
-                    user_number: '账号',
-                    user_password: '213213',
-                    user_name: '姓名',
-                    user_phone: '手机',
-                    user_role: '角色名称',
-                    company: '公司',
-                    buiding: '小区',
-                    state: '禁用',
-                },
+                formData: {},
+                updataForm: {},
                 company_option: [
                     {
                         label: '启用',
@@ -204,19 +196,14 @@
                this.$refs[formName].validate((valid) => {
                   if (valid) {          
 
-                    let params = {
-                        role_name: this.formData.role_name,
-                        role_des: this.formData.role_des,
-                        state: this.formData.state,
-
-                    };
-
                      this.$message({
                         type: 'success',
                         message: '修改成功!'
                     });
+
+                     this.updataForm = this.formData
                     
-                    this.$emit('updata_allback', params)
+                    this.$emit('updata_allback', this.updataForm)
 
                   } else {
                     this.$message({
@@ -238,15 +225,7 @@
             // 编辑
             updata_row(){
                 this.button_switch = false
-                let updata = this.pror_updata[0]
-                // 插入数据
-                this.formData = {
-                    role_name : updata.role_name,
-                    role_des : updata.role_des,
-                    state : updata.state,
-                };
-                //  权限
-                this.updata_checked = updata.obtain  
+                this.formData = this.pror_updata[0]
             },
             // 获取 多选
             getChecked(val){
@@ -258,12 +237,12 @@
             prop_visible(n){
                 this.visible = n
                 this.clear_array = !this.clear_array
-                for(let i in this.formData){
-                    if(i != 'state'){
-                        this.formData[i] = ''
-                    } 
-                };
-                this.formData.state = this.state_option[0].value
+                // for(let i in this.formData){
+                //     if(i != 'state'){
+                //         this.formData[i] = ''
+                //     } 
+                // };
+                // this.formData.state = this.state_option[0].value
             },
             visible(n){
                 this.$emit('close_mask', n)

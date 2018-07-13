@@ -1,6 +1,6 @@
 <template>
     <div class="DialogFn">
-      <el-dialog title="添加用户" :visible.sync="visible" width="50%">
+      <el-dialog title="添加小区" :visible.sync="visible" width="50%">
         <!-- <h4 class="title">角色信息</h4> -->
          <el-form 
          :model="formData" 
@@ -11,33 +11,45 @@
          class="demo-ruleForm">
             <el-form-item 
                 label="小区名称" 
-                prop="user_name">
+                prop="district_name">
                 <el-input 
-                    v-model="formData.user_name" 
+                    v-model="formData.district_name" 
                     placeholder="请输入小区名称">
                 </el-input>
             </el-form-item>
+            <el-form-item label="所属物业">
+                <el-select 
+                    v-model="formData.company"   
+                    placeholder="全部">
+                  <el-option
+                      v-for="item in company_option"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                  </el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item 
-                label="所属物业" 
-                prop="user_phone">
+                label="楼栋" 
+                prop="district_number">
                 <el-input 
-                    v-model="formData.user_phone" 
-                    placeholder="请输入所属物业">
+                    v-model="formData.district_number" 
+                    placeholder="请输入楼栋">
                 </el-input>
             </el-form-item>
             <el-form-item 
                 label="联系人姓名" 
-                prop="user_number">
+                prop="contacts_name">
                 <el-input 
-                    v-model="formData.user_number" 
+                    v-model="formData.contacts_name" 
                     placeholder="请输入联系人姓名">
                 </el-input>
             </el-form-item>
             <el-form-item 
                 label="联系人电话" 
-                prop="user_password">
+                prop="contacts_phone">
                 <el-input 
-                    v-model="formData.user_password" 
+                    v-model="formData.contacts_phone" 
                     placeholder="请输入联系人电话">
                 </el-input>
             </el-form-item>
@@ -66,7 +78,7 @@
                 <el-button 
                     type="primary" 
                     @click="submit_add('ruleForm')">    
-                    添加保存
+                    添加
                 </el-button>
                 <el-button 
                     type="primary" 
@@ -80,7 +92,7 @@
                 <el-button 
                     type="primary" 
                     @click="submit_edit('ruleForm')">    
-                    修改保存
+                    保存
                 </el-button>
                 <el-button 
                     type="primary" 
@@ -97,6 +109,7 @@
 
 <script>
     // import Checkbox from "./Checkbox.vue";
+    import { UpdateProperty } from "../../../../../api/api.js";
 
     export default {
         name: 'DialogFn',
@@ -107,33 +120,14 @@
                 clear_array: false,
                 updata_checked: [],  // 编辑 传入的 多选
                 formData: {
-                    user_number: '账号',
-                    user_password: '213213',
-                    user_name: '姓名',
-                    user_phone: '手机',
-                    user_role: '角色名称',
-                    company: '公司',
-                    buiding: '小区',
-                    state: '禁用',
+                        district_name: '',
+                        district_number: '',
+                        company: '',
+                        contacts_name: '',
+                        contacts_phone: '',
+                        state: '',
                 },
-                company_option: [
-                    {
-                        label: '启用',
-                        value: '启用',
-                    },{
-                        label: '禁用',
-                        value: '禁用',
-                    }
-                ],
-                buiding_option: [
-                    {
-                        label: '启用',
-                        value: '启用',
-                    },{
-                        label: '禁用',
-                        value: '禁用',
-                    }
-                ],
+                company_option: [],
                 state_option: [
                     {
                         label: '启用',
@@ -145,11 +139,11 @@
                 ],
                 // 验证规则
                 rules: {
-                    user_name: { required: true, message: '请输入用户姓名', trigger: 'blur' },
-                    user_phone: { required: true, message: '请输入用户手机号', trigger: 'blur' },
-                    user_number: { required: true, message: '请输入用户账号', trigger: 'blur' },
-                    user_password: { required: true, message: '请输入用户账号', trigger: 'blur' },
-                    'formData.company': { required: true, message: '请输入用户账号', trigger: 'blur' }
+                    district_name: { required: true, message: '请输入小区名称', trigger: 'blur' },
+                    district_number: { required: true, message: '请输入小区楼栋', trigger: 'blur' },
+                    contacts_name: { required: true, message: '请输入联系人姓名', trigger: 'blur' },
+                    contacts_phone: { required: true, message: '请输入联系人电话', trigger: 'blur' },
+                    company: { required: true, message: '请选择物业公司', trigger: 'blur' },
                 },
             }
         },
@@ -166,18 +160,20 @@
         components: {
             // Checkbox,
         },
+        created(){
+            
+        },
         methods: {
+
+        
             // 添加 提交
             submit_add(formName){
                 this.$refs[formName].validate((valid) => {
                   if (valid) {          
-            
                         // 参数
+                          console.log(this.$refs['ruleForm'])
                         let params = {
-                            role_name: this.formData.role_name,
-                            role_des: this.formData.role_des,
-                            state: this.formData.state,
-                            obtain: this.formData.obtain == "" ? [] : this.formData.obtain,
+                            // district_name: this.
                         };
 
                         this.$message({

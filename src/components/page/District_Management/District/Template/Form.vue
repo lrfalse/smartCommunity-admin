@@ -6,65 +6,53 @@
                 border 
                 style="width: 100%" 
                 ref="multipleTable">
-                <!-- <el-table-column 
-                    type="selection" 
-                    width="55">        
-                </el-table-column> -->
                 <el-table-column     
                     label="小区名称" 
-                    prop="user_number" 
+                    prop="district_name" 
                     width="150" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="楼栋数量" 
-                    prop="user_name" 
+                    prop="district_number" 
                     width="150" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="所属物业" 
-                    prop="user_phone" 
+                    prop="company" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="联系人姓名" 
-                    prop="user_role" 
+                    prop="contacts_name" 
                     width="180" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="联系人手机" 
                     width="180" 
-                    prop="company" 
+                    prop="contacts_phone" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="小区状态" 
-                    prop="company" 
+                    prop="state" 
                     width="80" 
                     align="center">
                 </el-table-column>
             </el-table>
             <div class="pagination">
-                <div>
-                    <el-button 
-                        type="primary" 
-                        @click="visible = true">    
-                        添加小区
-                    </el-button>
-
-                    <el-button 
-                        type="primary" 
-                        @click="visible1 = true">    
-                        添加楼栋
-                    </el-button>
-                </div>
+                <el-button 
+                    type="primary" 
+                    @click="visible = true">    
+                    添加小区
+                </el-button>
                     
                 <el-pagination 
                     @current-change="handleCurrentChange" 
                     layout="prev, pager, next" 
-                    :total="formData.length">
+                    :total="pages">
                 </el-pagination>
             </div>
         </div>
@@ -86,30 +74,17 @@
         @deletions="deletions"
          ></DeleteTemplate>
 
-         <!-- 添加楼栋 -->
-         <DialogBuiding
-            @close_mask="close_mask"
-            @add_callback="get_add"
-            @updata_allback="get_updata"
-
-            :pror_updata="updataRow"
-            :prop_visible="visible1"
-         >
-             
-         </DialogBuiding>
-
     </div>
 
 
 </template>
 
 <script>
-    // import curd from "../../../../../assets/class/CURD.js";
-    // import { SaveProperty, FindPropertyCompanys } from "../../../../../api/api.js";
 
     import DialogTemplate from "../Components/Dialog.vue";
-    import DialogBuiding from "../Components/DialogBuiding.vue";
     import DeleteTemplate from "../../../../common/Delete/Delete.vue";
+
+    import { FindPropertyCompanys } from "../../../../../api/api.js";
 
     export default {
         name: 'buiding_form',
@@ -118,19 +93,19 @@
                 // 打开/关闭 dialog
                 visible: false,
                 visible1: true,
-                // 初始 表单数据
-                formData: [
-                    {
-                        user_number: '账号',
-                        user_name: '姓名',
-                        user_phone: '手机',
-                        user_role: '角色名称',
-                        company: '公司',
-                        buiding: '小区',
-                        state: '禁用',
+                // 初始 表单数据   
+                formData: [],
+                // formData: [
+                //     {
+                //         district_name: '',
+                //         district_number: '',
+                //         company: '',
+                //         contacts_name: '',
+                //         contacts_phone: '',
+                //         state: '',
 
-                    },
-                ],
+                //     },
+                // ],
                
                 //  删除 弹窗 开关
                 del_visible: false, 
@@ -144,9 +119,29 @@
         components: {
             DialogTemplate,
             DeleteTemplate,
-            DialogBuiding,
+        },
+        computed: {
+          pages(){
+            return this.formData.length < 1 ? 1 : this.formData.length
+          }
+        },
+        created(){
+
         },
         methods: {
+            // 获取物业公司
+            FindPropertyCompanysApi(){
+                let params = {
+                    page: 1,
+                };
+
+                FindPropertyCompanys(params).then(data=>{
+                    this.company_option = JSON.parse(data.body).list
+                    console.log(this.company_option)
+                    
+                })
+            },
+
             // 关闭 添加角色弹窗
             close_mask(val){
                 this.visible = val
@@ -185,6 +180,7 @@
             // 获取 修改数据
             get_updata(data){
                 this.$set(this.formData, this.rowIndex, data)
+                
             },
             
 

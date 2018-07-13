@@ -6,30 +6,26 @@
                 border 
                 style="width: 100%" 
                 ref="multipleTable">
-                <!-- <el-table-column 
-                    type="selection" 
-                    width="55">        
-                </el-table-column> -->
                 <el-table-column     
                     label="公司全称" 
-                    prop="user_number" 
+                    prop="propertyName" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="公司简称" 
-                    prop="user_name" 
+                    prop="propertyShortname" 
                     width="240" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="联系人姓名" 
-                    prop="user_phone" 
+                    prop="name" 
                     width="150" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="联系人电话" 
-                    prop="user_role" 
+                    prop="phone" 
                     width="150" 
                     align="center">
                 </el-table-column>
@@ -91,11 +87,10 @@
 </template>
 
 <script>
-    // import curd from "../../../../../assets/class/CURD.js";
-    // import { SaveProperty, FindPropertyCompanys } from "../../../../../api/api.js";
-
     import DialogTemplate from "../Components/Dialog.vue";
     import DeleteTemplate from "../../../../common/Delete/Delete.vue";
+
+    import { FindPropertyCompanys, SaveProperty } from "../../../../../api/api.js";
 
     export default {
         name: 'buiding_form',
@@ -104,25 +99,16 @@
                 // 打开/关闭 dialog
                 visible: false,
                 // 初始 表单数据
-                formData: [
-                    {
-                        user_number: '账号',
-                        user_name: '姓名',
-                        user_phone: '手机',
-                        user_role: '角色名称',
-                        company: '公司',
-                        buiding: '小区',
-                        state: '禁用',
+                formData: [],
 
-                    },
-                ],
-               
                 //  删除 弹窗 开关
                 del_visible: false, 
                 //编辑 容器
                 updataRow: [],
                 // 获取 索引
-                rowIndex: -1,  
+                rowIndex: -1, 
+
+                company_option: [], 
           
             }
         },
@@ -130,7 +116,30 @@
             DialogTemplate,
             DeleteTemplate,
         },
+        created(){
+            this.FindPropertyCompanysApi()
+        },
+        computed: {
+
+        },
         methods: {
+            // 获取物业公司
+            FindPropertyCompanysApi(){
+                let params = {
+                    page: 1,
+                };
+                FindPropertyCompanys(params).then(data=>{
+                    this.formData = JSON.parse(data.body).list
+
+                    this.formData.map(x=>{    
+                        if(x.isValid){
+                            this.$set(x, 'state', '启用')
+                        }else{
+                            this.$set(x, 'state', '禁用')
+                        }
+                    })
+                })
+            },
             // 关闭 添加角色弹窗
             close_mask(val){
                 this.visible = val
@@ -159,12 +168,14 @@
                 this.updataRow = []
                 this.rowIndex = index
                 this.updataRow.push(row)
-                // console.log(row)
             },
             // 获取 添加数据
             get_add(data){
                 this.formData.push(data)
-                console.log(data)
+                SaveProperty(data).then(data=>{
+                    console.log(data)
+                    this.$message.error(data.statusMsg);
+                })
             },
             // 获取 修改数据
             get_updata(data){

@@ -59,11 +59,16 @@ export const Login = params => { return axios.post('/login',params).then(res => 
 export const AddSysUser = params => { return axios.post('/addSysUser',params).then(res => res.data);};
 // 新增物业信息接口
 export const SaveProperty = params => { return axios.post('/saveProperty',params).then(res => res.data);};
-// 	获取业务公司列表
+// 	获取物业公司列表
 export const FindPropertyCompanys = params => { return axios.post('/findPropertyCompanys',params).then(res => res.data);};
+// 修改 物业公司信息
+export const UpdateProperty = params => { return axios.post('/updateProperty',params).then(res => res.data);};
 // 省
 export const FindProvinces = params => { return axios.post('/findProvinces',params).then(res => res.data);};
 // 市
 export const FindCitys = params => { return axios.post('/findCitys',params).then(res => res.data);};
 // 区
 export const FindAreas = params => { return axios.post('/findAreas',params).then(res => res.data);};
+
+// 添加小区信息
+export const SaveHousingestate = params => { return axios.post('/saveHousingestate',params).then(res => res.data);};
