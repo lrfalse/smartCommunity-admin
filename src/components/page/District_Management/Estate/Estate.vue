@@ -4,18 +4,19 @@
            <el-form 
               :inline="true" 
               :model="search" 
+              ref="searchForm"
               class="demo-form-inline">
             <el-form-item label="公司名称">
               <el-input 
-                  v-model="search.user" 
+                  v-model="search.name" 
                   placeholder="请输入用户账号"></el-input>
             </el-form-item>
            
             
               <el-form-item label="公司状态">
                   <el-select 
-                      v-model="state_option.value"   
-                      
+                      v-model="state_option[1].value"   
+                      disabled
                       placeholder="全部">
                     <el-option
                         v-for="item in state_option"
@@ -27,13 +28,15 @@
               </el-form-item>
 
             <el-form-item class="button">
-              <el-button type="primary">查询</el-button>
-              <el-button type="primary">重置</el-button>
+              <el-button type="primary" @click="searchFn">查询</el-button>
+              <el-button type="primary" @click="resetSearc">重置</el-button>
             </el-form-item>
 
           </el-form>
        </div>
 
+
+    <!-- form -->
 
            <div class="container">
               <el-table 
@@ -48,14 +51,14 @@
                   </el-table-column>
                   <el-table-column     
                       label="公司简称" 
-                      prop="propertyshortName" 
+                      prop="propertyShortname" 
                       width="240" 
                       align="center">
                   </el-table-column>
                   <el-table-column     
                       label="联系人姓名" 
                       prop="name" 
-                      width="150" 
+                      width="120" 
                       align="center">
                   </el-table-column>
                   <el-table-column     
@@ -72,16 +75,17 @@
                   </el-table-column>
                   <el-table-column 
                       label="操作" 
-                      width="180" 
+                      width="80" 
                       align="center">
                       <template slot-scope="scope">
                           <el-button 
                               size="small" 
+                              type="primary "
                               @click="edit_dialog(scope.$index, scope.row)">编辑</el-button>
-                          <el-button 
+                         <!--  <el-button 
                               size="small" 
                               type="danger" 
-                              @click="delete_dialog(scope.$index, scope.row)">删除</el-button>
+                              @click="delete_dialog(scope.$index, scope.row)">删除</el-button> -->
                       </template>
                   </el-table-column>
               </el-table>
@@ -89,7 +93,7 @@
                   <el-button 
                       type="primary" 
                       @click="add_visible = true">    
-                      添加用户
+                      添加物业
                   </el-button>
                   <el-pagination 
                       @current-change="handleCurrentChange" 
@@ -121,9 +125,9 @@
               </el-form-item>
               <el-form-item 
                   label="公司简称" 
-                  prop="propertyshortName">
+                  prop="propertyShortname">
                   <el-input 
-                      v-model="add_formData.propertyshortName" 
+                      v-model="add_formData.propertyShortname" 
                       placeholder="请输入公司简称">
                   </el-input>
               </el-form-item>
@@ -140,6 +144,7 @@
                   prop="phone">
                   <el-input 
                       v-model="add_formData.phone" 
+                      maxlength="11"
                       placeholder="请输入联系人电话">
                   </el-input>
               </el-form-item>
@@ -209,9 +214,9 @@
               </el-form-item>
               <el-form-item 
                   label="公司简称" 
-                  prop="propertyshortName">
+                  prop="propertyShortname">
                   <el-input 
-                      v-model="updata_form.propertyshortName" 
+                      v-model="updata_form.propertyShortname" 
                       placeholder="请输入公司简称">
                   </el-input>
               </el-form-item>
@@ -228,6 +233,7 @@
                   prop="phone">
                   <el-input 
                       v-model="updata_form.phone" 
+                      maxlength="11"
                       placeholder="请输入联系人电话">
                   </el-input>
               </el-form-item>
@@ -273,7 +279,7 @@
 
 <script>
    
-    // import {FindProvinces, FindCitys, FindAreas} from "../../../../api/api.js";
+    import { FindPropertyCompanys, SaveProperty, UpdateProperty } from "../../../../api/api.js";
 
     export default {
         name: 'Estate',
@@ -311,14 +317,28 @@
                 // 验证规则
                 rules: {
                     propertyName: { required: true, message: '请输入公司全称', trigger: 'blur' },
-                    propertyshortName: { required: true, message: '请输入公司简称', trigger: 'blur' },
-                    name: { required: true, message: '请输入联系人姓名', trigger: 'blur' },
-                    phone: { required: true, message: '请输入联系人电话', trigger: 'blur' },
+                    propertyShortname: { required: true, message: '请输入公司简称', trigger: 'blur' },
+                    name: [
+                      { required: true, message: '请输入联系人姓名', trigger: 'blur' },
+                      { min: 2, message: '请输入正确的姓名', trigger: 'blur' },
+                      { pattern: /^[\u4E00-\u9FA5]+$/, message: '用户名只能为中文', trigger: 'blur' },
+                    ],
+                    phone: [
+                      { required: true, message: '请输入联系人电话', trigger: 'blur' },
+                      {validator:function(rule,value,callback){
+                          if(/^1[34578]\d{9}$/.test(value) == false){
+                              callback(new Error("请输入正确的手机号"));
+                          }else{
+                              callback();
+                          }
+                      }, trigger: 'blur'},
+                    ],
+                    
                 },
             }
         },
         created(){
-          
+          this.FindPropertyCompanysApi()
         },
         computed: {
           pages(){
@@ -326,6 +346,35 @@
           },
         },
         methods: {
+          // 查询
+          searchFn(){
+            this.formData = []
+            let params = {
+              propertyName : this.search.name,
+              page: 1,
+            };
+            FindPropertyCompanys(params).then(data=>{     
+                console.log(data)     
+                this.formData = JSON.parse(data.body).list
+                this.formData.map(x=>{
+                  x.isValid ? x.isValid = '启用' : x.isValid = '禁用';
+                })
+            })
+          },
+          // 获取物业公司列表
+          FindPropertyCompanysApi(){
+            let params = {
+              page: 1,
+            };
+            FindPropertyCompanys(params).then(data=>{     
+                console.log(data)     
+                this.formData = JSON.parse(data.body).list
+                this.formData.map(x=>{
+                  x.isValid ? x.isValid = '启用' : x.isValid = '禁用';
+                })
+                console.log(this.formData) 
+            })
+          },
           //翻页
           handleCurrentChange(){
             console.log('翻页')
@@ -338,24 +387,30 @@
                       this.$set(this.add_formData, 'isValid', 1)
                       console.log(this.add_formData.isValid)
                       
-                      this.formData.push(this.add_formData)
+                      // this.formData.push(this.add_formData)
 
-
-                      for(let i = 0; i < this.formData.length; i++){
-                        this.formData[i].isValid == 0? 
-                        this.formData[i].isValid = '禁用' : 
-                        this.formData[i].isValid = '启用'
-                      }
-
-                      this.$message({
-                          type: 'success',
-                          message: '添加成功!'
+                      SaveProperty(this.add_formData).then(data=>{
+                        console.log(data)
+                        if(data.statusCode === '000'){
+                          this.$message({
+                              type: 'success',
+                              message: '添加成功!'
+                          });
+                          this.$nextTick(()=>{
+                            this.FindPropertyCompanysApi()
+                          })
+                        }else{
+                          this.$message({
+                              type: 'error',
+                              message: data.statusMsg,
+                          });
+                        }
                       });
 
                 } else {
                       this.$message({
                           type: 'error',
-                          message: '请填写完整信息!'
+                          message: '请输入正确信息',
                       });
                   
                       return false;
@@ -381,16 +436,18 @@
             this.del_visible = false;
           },
           
-          // 编辑
+          // 读取 一行数据
           edit_dialog(index, row){
             this.rowIndex = index
-            console.log(row)
+            const item = this.formData[index]
+            console.log(item)
             this.updata_form = {
-              propertyName: row.propertyName,
-              propertyshortName: row.propertyshortName,
-              name: row.name,
-              phone: row.phone,
-              isValid: row.isValid,
+              propertyName: item.propertyName,
+              propertyShortname: item.propertyShortname,
+              name: item.name,
+              phone: item.phone,
+              isValid: item.isValid,
+              id: item.id,
             };
             this.updata_visible = true
           },
@@ -399,13 +456,28 @@
           save_add(){
             this.$refs['ruleForm'].validate((valid) => {
                   if (valid) {          
+                    this.updata_form.isValid == '启用' ?
+                    this.updata_form.isValid = 1 : 
+                    this.updata_form.isValid = 0
+ // == '启用' ? item.isValid = 1 : item.isValid = 0
 
-                    this.$set(this.formData, this.rowIndex, this.updata_form)
 
-                     this.$message({
-                        type: 'success',
-                        message: '修改成功!'
-                    });
+                    UpdateProperty(this.updata_form).then(data=>{
+                      if(data.statusCode === '000'){
+                        this.$message({
+                            type: 'success',
+                            message: '修改成功!'
+                        });
+
+                        this.FindPropertyCompanysApi();
+                      }else{
+                        this.$message({
+                            type: 'error',
+                            message: data.statusMsg,
+
+                        });
+                      }
+                    });                   
                     
                   } else {
                     this.$message({
@@ -418,8 +490,13 @@
 
                   this.updata_visible = false
                 });
-          },      
-           
+          },   
+
+          // 重置   searchForm
+           resetSearc() {
+                this.search = {}
+                this.FindPropertyCompanysApi()
+           },
         },
 
     };

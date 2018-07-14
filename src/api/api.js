@@ -59,7 +59,7 @@ export const Login = params => { return axios.post('/login',params).then(res => 
 export const AddSysUser = params => { return axios.post('/addSysUser',params).then(res => res.data);};
 // 新增物业信息接口
 export const SaveProperty = params => { return axios.post('/saveProperty',params).then(res => res.data);};
-// 	获取物业公司列表
+// 	获取物业公司列表 / 查询
 export const FindPropertyCompanys = params => { return axios.post('/findPropertyCompanys',params).then(res => res.data);};
 // 修改 物业公司信息
 export const UpdateProperty = params => { return axios.post('/updateProperty',params).then(res => res.data);};
@@ -72,3 +72,7 @@ export const FindAreas = params => { return axios.post('/findAreas',params).then
 
 // 添加小区信息
 export const SaveHousingestate = params => { return axios.post('/saveHousingestate',params).then(res => res.data);};
+// 获取/ 查询 小区信息
+export const FindHousingestate = params => { return axios.post('/findHousingestate',params).then(res => res.data);};
+// 修改小区信息
+export const UpdateHousingestate = params => { return axios.post('/updateHousingestate',params).then(res => res.data);};

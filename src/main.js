@@ -34,18 +34,3 @@ new Vue({
     router,
     render: h => h(App)
 }).$mount('#app');
-
-
-
-// import api from './class/classApi.js'
-// // Vue.prototype.axios11 = api
-// Vue.use(api)
-
-//  let params = {
-//             a: '1',
-//             b: '2',
-//         }
-
-//     let cont = api.get('127.0.0.1', params)
-//         console.log(cont)
-    

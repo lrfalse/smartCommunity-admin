@@ -8,20 +8,20 @@
          
             <el-form-item label="物业公司">
                 <el-select 
-                    v-model="buiding_option.value"   
+                    v-model="search.propertyId"   
                     placeholder="全部">
                   <el-option
-                      v-for="item in buiding_option"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
+                      v-for="item in company_option"
+                      :key="item.id"
+                      :label="item.propertyName"
+                      :value="item.id">
                   </el-option>
                 </el-select>
             </el-form-item>
 
             <el-form-item label="小区名称">
               <el-input 
-                  v-model="search.user" 
+                  v-model="search.name" 
                   placeholder="请输入小区名称"></el-input>
             </el-form-item>
             <el-form-item label="小区状态">
@@ -41,14 +41,13 @@
             
 
           <el-form-item class="button">
-            <el-button type="primary">查询</el-button>
-            <el-button type="primary">重置</el-button>
+            <el-button type="primary" @click="searchFn">查询</el-button>
+            <el-button type="primary" @click="resetForm">重置</el-button>
           </el-form-item>
         </el-form>
        </div>
 
        <!-- 表单 -->
-
 
            <div class="container">
             <el-table 
@@ -59,43 +58,60 @@
                 <el-table-column     
                     label="小区名称" 
                     prop="name" 
-                    width="150" 
+                    width="180" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="楼栋数量" 
-                    prop="district_number" 
-                    width="150" 
+                    prop="buildings" 
+                    width="80" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="所属物业" 
-                    prop="company" 
+                    prop="propertyName" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="联系人姓名" 
-                    prop="contacts_name" 
-                    width="180" 
+                    prop="contacts" 
+                    width="120" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="联系人手机" 
-                    width="180" 
-                    prop="contacts_phone" 
+                    width="150" 
+                    prop="phone" 
                     align="center">
                 </el-table-column>
                 <el-table-column     
                     label="小区状态" 
-                    prop="state" 
+                    prop="isValid" 
                     width="80" 
                     align="center">
                 </el-table-column>
+                <el-table-column 
+                      label="操作" 
+                      width="80" 
+                      align="center">
+                      <template slot-scope="scope">
+                          <el-button 
+                              size="small" 
+                              type="primary"
+                              @click="edit_dialog(scope.$index, scope.row)">编辑</el-button>
+                         <!--  <el-button 
+                              size="small" 
+                              type="danger" 
+                              @click="delete_dialog(scope.$index, scope.row)">删除</el-button> -->
+                      </template>
+                  </el-table-column>
             </el-table>
+
+
             <div class="pagination">
                 <el-button 
                     type="primary" 
-                    @click="visible = true">    
+                    @click="add_visible = true">    
                     添加小区
                 </el-button>
                     
@@ -109,78 +125,96 @@
 
        <!-- 添加 -->
 
-    <el-dialog title="添加用户" :visible.sync="add_visible" width="40%">
+    <el-dialog title="添加小区" :visible.sync="add_visible" width="40%">
         
          <el-form 
-           :model="add_formData" 
-           :rules="rules" 
-           :inline="true"
-           ref="ruleForm" 
-           label-width="100px" 
-           class="demo-ruleForm">
-              <el-form-item 
-                  label="公司全称" 
-                  prop="propertyName">
-                  <el-input 
-                      v-model="add_formData.propertyName" 
-                      placeholder="请输入公司全称">
-                  </el-input>
-              </el-form-item>
-              <el-form-item 
-                  label="公司简称" 
-                  prop="propertyshortName">
-                  <el-input 
-                      v-model="add_formData.propertyshortName" 
-                      placeholder="请输入公司简称">
-                  </el-input>
-              </el-form-item>
-              <el-form-item 
-                  label="联系人姓名" 
-                  prop="name">
-                  <el-input 
-                      v-model="add_formData.name" 
-                      placeholder="请输入联系人姓名">
-                  </el-input>
-              </el-form-item>
-              <el-form-item 
-                  label="联系人电话" 
-                  prop="phone">
-                  <el-input 
-                      v-model="add_formData.phone" 
-                      placeholder="请输入联系人电话">
-                  </el-input>
-              </el-form-item>
-              <el-form-item label="小区状态">
-                  <el-select 
-                      v-model="state_option[1].label"  
-                      disabled 
-                      no-data-text="启用"
-                      placeholder="全部">
-                    <el-option
-                        v-for="item in state_option"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                    </el-option>
-                  </el-select>
-              </el-form-item>
+         :model="add_formData" 
+         :rules="rules" 
+         :inline="true"
+         ref="ruleForm" 
+         label-width="100px" 
+         class="demo-ruleForm">
+            <el-form-item 
+                label="城市" 
+                prop="city_selected">
+                <el-cascader
+                  :options="city_options"
+                  v-model="add_formData.city_selected"
+                  @change="handleChange">
+                </el-cascader>
 
-              
-              <!-- 添加角色 submit -->
-              <div class="submit">
-                  <el-button 
-                      type="primary" 
-                      @click="submit_add('ruleForm')">    
-                      添加
-                  </el-button>
-                  <el-button 
-                      type="primary" 
-                      @click="add_visible = false">    
-                      关闭
-                  </el-button>
-              </div>
 
-          </el-form>
+            </el-form-item>
+            <el-form-item 
+                label="小区名称" 
+                prop="name">
+                <el-input 
+                    v-model="add_formData.name" 
+                    placeholder="请输入小区名称">
+                </el-input>
+            </el-form-item>
+
+            <el-form-item 
+              label="所属物业" 
+              prop="property_id">
+                <el-select 
+                    v-model="add_formData.property_id"  
+                    placeholder="全部">
+                  <el-option
+                      v-for="item in company_option"
+                      :key="item.id"
+                      :label="item.propertyName"
+                      :value="item.id">
+                  </el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item 
+                label="联系人姓名" 
+                prop="contacts">
+                <el-input 
+                    v-model="add_formData.contacts" 
+                    placeholder="请输入联系人姓名">
+                </el-input>
+            </el-form-item>
+            <el-form-item 
+                label="联系人电话" 
+                prop="phone">
+                <el-input 
+                    v-model="add_formData.phone" 
+                    maxlength="11"
+                    placeholder="请输入联系人电话">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="小区状态">
+                <el-select 
+                    v-model="add_formData.state"   
+                    disabled 
+                    placeholder="启用">
+                  <el-option
+                      v-for="item in state_option"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                  </el-option>
+                </el-select>
+            </el-form-item>
+            
+            <!-- 添加 submit -->
+            <div class="submit">
+                <el-button 
+                    type="primary" 
+                    @click="submit_add('ruleForm')">    
+                    添加
+                </el-button>
+                <el-button 
+                    type="primary" 
+                    @click="add_visible = false">    
+                    关闭
+                </el-button>
+            </div>
+
+        </el-form>
 
       </el-dialog>
 
@@ -197,78 +231,98 @@
 
   <!-- 编辑 -->
 
-    <el-dialog title="添加用户" :visible.sync="updata_visible" width="40%">
+    <el-dialog title="添加小区" :visible.sync="updata_visible" width="40%">
         
          <el-form 
-           :model="updata_form" 
-           :rules="rules" 
-           :inline="true"
-           ref="ruleForm" 
-           label-width="100px" 
-           class="demo-ruleForm">
-              <el-form-item 
-                  label="公司全称" 
-                  prop="propertyName">
-                  <el-input 
-                      v-model="updata_form.propertyName" 
-                      placeholder="请输入公司全称">
-                  </el-input>
-              </el-form-item>
-              <el-form-item 
-                  label="公司简称" 
-                  prop="propertyshortName">
-                  <el-input 
-                      v-model="updata_form.propertyshortName" 
-                      placeholder="请输入公司简称">
-                  </el-input>
-              </el-form-item>
-              <el-form-item 
-                  label="联系人姓名" 
-                  prop="name">
-                  <el-input 
-                      v-model="updata_form.name" 
-                      placeholder="请输入联系人姓名">
-                  </el-input>
-              </el-form-item>
-              <el-form-item 
-                  label="联系人电话" 
-                  prop="phone">
-                  <el-input 
-                      v-model="updata_form.phone" 
-                      placeholder="请输入联系人电话">
-                  </el-input>
-              </el-form-item>
-              <el-form-item label="小区状态">
-                  <el-select 
-                      v-model="state_option[1].label"  
-                      disabled 
-                      no-data-text="启用"
-                      placeholder="全部">
-                    <el-option
-                        v-for="item in state_option"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                    </el-option>
-                  </el-select>
-              </el-form-item>   
+         :model="updata_form" 
+         :rules="rules" 
+         :inline="true"
+         ref="ruleForm" 
+         label-width="100px" 
+         class="demo-ruleForm">
+            <el-form-item 
+                label="城市" 
+                prop="city_selected">
+                <el-cascader
+                  :options="city_options"
+                  v-model="updata_form.city_selected"
+                  @change="handleChange_updata">
+                </el-cascader>
 
-              <!-- 编辑 submit -->
-              <div class="submit">
-                  <el-button 
-                      type="primary" 
-                      @click="save_add('ruleForm')">    
-                      保存
-                  </el-button>
-                  <el-button 
-                      type="primary" 
-                      @click="updata_visible = false">    
-                      关闭
-                  </el-button>
-              </div>
 
-            </el-form>
-          </el-dialog>
+            </el-form-item>
+            <el-form-item 
+                label="小区名称" 
+                prop="name">
+                <el-input 
+                    v-model="updata_form.name" 
+                    placeholder="请输入小区名称">
+                </el-input>
+            </el-form-item>
+
+            <el-form-item 
+              label="所属物业" 
+              prop="property_id">
+                <el-select 
+                    v-model="updata_form.property_id"  
+                    placeholder="全部">
+                  <el-option
+                      v-for="item in company_option"
+                      :key="item.id"
+                      :label="item.propertyName"
+                      :value="item.id">
+                  </el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item 
+                label="联系人姓名" 
+                prop="contacts">
+                <el-input 
+                    v-model="updata_form.contacts" 
+                    placeholder="请输入联系人姓名">
+                </el-input>
+            </el-form-item>
+            <el-form-item 
+                label="联系人电话" 
+                prop="phone">
+                <el-input 
+                    v-model="updata_form.phone" 
+                    maxlength="11"
+                    placeholder="请输入联系人电话">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="小区状态">
+                <el-select 
+                    v-model="updata_form.state"   
+                    disabled 
+                    placeholder="启用">
+                  <el-option
+                      v-for="item in state_option"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                  </el-option>
+                </el-select>
+            </el-form-item>
+            
+            <!-- 添加 submit -->
+            <div class="submit">
+                <el-button 
+                    type="primary" 
+                    @click="save_add('ruleForm')">    
+                    修改
+                </el-button>
+                <el-button 
+                    type="primary" 
+                    @click="updata_visible = false">    
+                    关闭
+                </el-button>
+            </div>
+
+        </el-form>
+
+      </el-dialog>
 
 
 
@@ -279,8 +333,14 @@
 </template>
 
 <script>
-   
-    // import {FindProvinces, FindCitys, FindAreas} from "../../../../api/api.js";
+
+    import { FindPropertyCompanys, 
+      FindProvinces, 
+      FindCitys, 
+      SaveHousingestate, 
+      FindAreas, 
+      FindHousingestate, 
+      UpdateHousingestate, } from "../../../../api/api.js";
 
     export default {
         name: 'District',
@@ -301,22 +361,20 @@
                   },
                 ],
                 // 物业
-                buiding_option: [
-                  {
-                    label: '金科',
-                    value: 0,
-                    
-                  },{
-                    label: '万科',
-                    value: 1,
-                  },
-                ],
-
+                company_option: [],
+                propertyName: '',
+                // 城市
+                city_options: [],
+                city_selected: [],
+                city_name: [],
+                sss: {
+                  label:1,
+                  label:2,
+                },
                 // 添加
                 add_formData: {},
                 add_state: '启用',
                 add_visible: false,
-
                 // 删除
                 del_visible : false,
                 // 编辑
@@ -328,15 +386,36 @@
 
                 // 验证规则
                 rules: {
-                    propertyName: { required: true, message: '请输入公司全称', trigger: 'blur' },
-                    propertyshortName: { required: true, message: '请输入公司简称', trigger: 'blur' },
-                    name: { required: true, message: '请输入联系人姓名', trigger: 'blur' },
-                    phone: { required: true, message: '请输入联系人电话', trigger: 'blur' },
+                    city_selected: { required: true, message: '请选择城市', trigger: 'blur' },
+                    property_id: { required: true, message: '请选择物业公司', trigger: 'blur' },
+                    name: { required: true, message: '请输入小区名称', trigger: 'blur' },
+                    contacts: [
+                      { required: true, message: '请输入联系人姓名', trigger: 'blur' },
+                      { min: 2, message: '请输入正确的姓名', trigger: 'blur' },
+                      { pattern: /^[\u4E00-\u9FA5]+$/, message: '用户名只能为中文', trigger: 'blur' },
+                    ],
+                    phone: [
+                      { required: true, message: '请输入联系人电话', trigger: 'blur' },
+                      {validator:function(rule,value,callback){
+                          if(/^1[34578]\d{9}$/.test(value) == false){
+                              callback(new Error("请输入正确的手机号"));
+                          }else{
+                              callback();
+                          }
+                      }, trigger: 'blur'},
+                    ],
                 },
+
             }
         },
         created(){
-          
+          this.get_propertyName()
+          this.FindHousingestateApi()
+        },
+        mounted(){
+          this.$nextTick(()=>{
+            this.FindProvincesApi()
+          })
         },
         computed: {
           pages(){
@@ -344,6 +423,126 @@
           },
         },
         methods: {
+          handleChange_updata(){
+            console.log(1)
+          },
+          // 查询
+          searchFn(){
+            FindHousingestate(this.search).then(data=>{
+              if(data.statusCode === '000'){
+                this.formData = JSON.parse(data.body).list
+                this.formData.map(x=>{
+                  x.isValid ? x.isValid = '启用' : x.isValid = '禁用';
+                })
+              }
+            })
+          }, 
+          // 获取小区信息
+          FindHousingestateApi(){
+            FindHousingestate().then(data=>{
+              console.log(data)
+              if(data.statusCode === '000'){
+                this.formData = JSON.parse(data.body).list
+                this.formData.map(x=>{
+                  x.isValid ? x.isValid = '启用' : x.isValid = '禁用';
+                })
+                
+              }else{
+                console.log(data)
+                this.$message({
+                    type: 'error',
+                    message: data.statusMsg,
+                });
+              }
+              
+            })
+          },
+          // 获取 省/市/区
+          FindProvincesApi(){
+            FindProvinces().then(data=>{
+              let pro = JSON.parse(data.body).list
+              pro.map((x, index)=>{
+                this.$set(x, 'value', x.code)
+                this.$set(x, 'label', x.name)
+                this.$set(x, 'children', [])
+                this.$set(x, 'index', index)
+
+                FindCitys({provincesId: x.code}).then(data=>{
+                  let city = JSON.parse(data.body).list
+                    city.map((item, cityIndex)=>{
+                    this.$set(item, 'value', item.code)
+                    this.$set(item, 'label', item.name)
+                    this.$set(item, 'children', [])
+                    pro[index].children.push(item)
+
+                    // console.log(item.code)
+                    FindAreas({cityId:item.code}).then(data=>{
+                      let area = JSON.parse(data.body).list
+                      area.map(area=>{
+                        this.$set(area, 'value', area.code)
+                        this.$set(area, 'label', area.name)
+                        pro[index].children[cityIndex].children.push(area)
+                      })
+                    })
+                  })
+                })
+
+              });
+
+              this.$nextTick(()=>{
+                this.city_options = pro
+             
+              });
+              
+            })
+          },
+          
+          // 选择城市
+          handleChange(value){
+            this.city_selected = value
+
+            this.city_options.forEach((item, index)=>{
+              if(item.code == value[0]){
+                this.city_name.push(item.label)
+              };
+              item.children.forEach((cityName, cityIndex)=>{
+                if(cityName.code == value[1]){
+                  this.city_name.push(cityName.label)
+                };   
+                cityName.children.forEach((area, areaIndex)=>{
+                  if(area.code == value[2]){
+                    this.city_name.push(area.label) 
+
+                    console.log(this.city_name)
+                  };
+                  
+                })
+
+              })
+            });
+          },
+
+          // 获取 物业公司
+          get_propertyName(){
+            let params = {
+              rows: 999,
+              page: 1,
+            };
+            FindPropertyCompanys(params).then(data=>{
+              let obj = JSON.parse(data.body).list
+              let map = new Map()
+              obj.map((x, index)=>{
+                map.set(index, {
+                  'id': x.id,
+                  'propertyName': x.propertyName,
+                });
+
+              });
+              for(let i of map.values()){
+                this.company_option.push(i)
+              };
+            });
+          },
           //翻页
           handleCurrentChange(){
             console.log('翻页')
@@ -352,23 +551,46 @@
           submit_add(){
             this.$refs['ruleForm'].validate((valid) => {
                 if (valid) {  
-
-                      this.$set(this.add_formData, 'isValid', 1)
-                      console.log(this.add_formData.isValid)
-                      
-                      this.formData.push(this.add_formData)
-
-
-                      for(let i = 0; i < this.formData.length; i++){
-                        this.formData[i].isValid == 0? 
-                        this.formData[i].isValid = '禁用' : 
-                        this.formData[i].isValid = '启用'
+                    let propertyName = ''
+                    this.company_option.forEach(item=>{
+                      if(item.id == this.add_formData.property_id){
+                         propertyName = item.propertyName
                       }
+                    });
+                    
+                    let params = {
+                          propertyId : this.add_formData.property_id,   //是 物业公司id
+                          propertyName :  propertyName,  //是 物业公司名称
+                          provincesId : this.city_selected[0],  //是 省份id
+                          provincesName : this.city_name[0],  //是 省份名称
+                          cityId : this.city_selected[1],   //是 城市id
+                          cityName : this.city_name[1],   //是 城市名称
+                          areasId : this.city_selected[2],  //是 区域id
+                          areasName : this.city_name[2],  //是 区县名称
+                          name : this.add_formData.name,  //是 小区名称
+                          phone : this.add_formData.phone,  //是 联系电话
+                          contacts : this.add_formData.contacts,   //是 联系人
+                        };
 
-                      this.$message({
-                          type: 'success',
-                          message: '添加成功!'
-                      });
+                      SaveHousingestate(params).then(data=>{
+                        console.log(data)
+                        if(data.statusCode === '000'){
+                          this.$message({
+                              type: 'success',
+                              message: '添加成功!'
+                          });
+
+                          this.FindHousingestateApi()
+                        }else{
+                          this.$message({
+                              type: 'error',
+                              message: data.statusMsg,
+                          });
+                        }
+                      })
+
+ 
+                      
 
                 } else {
                       this.$message({
@@ -399,17 +621,27 @@
             this.del_visible = false;
           },
           
-          // 编辑
+          // 编辑z
           edit_dialog(index, row){
             this.rowIndex = index
-            console.log(row)
+            const item = this.formData[index]
+            console.log(item)
+            let provincesId = item.provincesId + ''
+            let cityId = item.cityId + ''
+            let areasId = item.areasId + ''
+
+            
             this.updata_form = {
-              propertyName: row.propertyName,
-              propertyshortName: row.propertyshortName,
-              name: row.name,
-              phone: row.phone,
-              isValid: row.isValid,
+              city_selected: [provincesId, cityId, areasId],
+              property_id : item.propertyId,   //是 物业公司id
+              propertyName :  item.propertyName,  //是 物业公司名称
+              name : item.name,  //是 小区名称
+              phone : item.phone,  //是 联系电话
+              contacts : item.contacts,   //是 联系人
+              city_name: [item.provincesName, item.cityName, item.areasName],
+              id: item.id,
             };
+
             this.updata_visible = true
           },
 
@@ -417,13 +649,45 @@
           save_add(){
             this.$refs['ruleForm'].validate((valid) => {
                   if (valid) {          
-
-                    this.$set(this.formData, this.rowIndex, this.updata_form)
-
-                     this.$message({
-                        type: 'success',
-                        message: '修改成功!'
+                    
+                    let propertyName = ''
+                    this.company_option.forEach(item=>{
+                          if(item.id == this.updata_form.property_id){
+                             propertyName = item.propertyName
+                        };
                     });
+
+                    let params = {
+
+                        id :  this.updata_form.id,   //是 小区id
+                        propertyId : this.updata_form.property_id,   //是 物业公司id
+                        propertyName :  propertyName,  //是 物业公司名称
+                        provincesId : this.updata_form.city_selected[0],  //是 省份id
+                        provincesName : this.updata_form.city_name[0],  //是 省份名称 
+                        cityId : this.updata_form.city_selected[1],   //是 城市id
+                        cityName : this.updata_form.city_name[1],   //是 城市名称
+                        areasId : this.updata_form.city_selected[2],  //是 区域id
+                        areasName : this.updata_form.city_name[2],  //是 区县名称
+                        name : this.updata_form.name,  //是 小区名称
+                        phone : this.updata_form.phone,  //是 联系电话
+                        contacts : this.updata_form.contacts,   //是 联系人
+                    };
+
+                    UpdateHousingestate(params).then(data=>{
+                      console.log(data)
+                      if(data.statusCode === '000'){
+                        this.FindHousingestateApi()
+                        this.$message({
+                            type: 'success',
+                            message: '修改成功!'
+                        });
+                      }else{
+                        this.$message({
+                            type: 'error',
+                            message: data.statusMsg,
+                        });
+                      }
+                    })    
                     
                   } else {
                     this.$message({
@@ -437,6 +701,11 @@
                   this.updata_visible = false
                 });
           },      
+
+          // 重置
+          resetForm(){
+             this.search = {}
+          },
            
         },
 
