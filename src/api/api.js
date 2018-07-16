@@ -76,3 +76,11 @@ export const SaveHousingestate = params => { return axios.post('/saveHousingesta
 export const FindHousingestate = params => { return axios.post('/findHousingestate',params).then(res => res.data);};
 // 修改小区信息
 export const UpdateHousingestate = params => { return axios.post('/updateHousingestate',params).then(res => res.data);};
+
+
+// 添加楼栋
+export const SaveBuilding = params => { return axios.post('/saveBuilding',params).then(res => res.data);};
+// 获取 / 查询 楼栋信息
+export const FindBuilding = params => { return axios.post('/findBuilding',params).then(res => res.data);};
+// 修改楼栋
+export const UpdateBuilding = params => { return axios.post('/updateBuilding',params).then(res => res.data);};

@@ -99,10 +99,10 @@
                               size="small" 
                               type="primary"
                               @click="edit_dialog(scope.$index, scope.row)">编辑</el-button>
-                         <!--  <el-button 
+                          <!-- <el-button 
                               size="small" 
-                              type="danger" 
-                              @click="delete_dialog(scope.$index, scope.row)">删除</el-button> -->
+                              type="success" 
+                              @click="del_dialog(scope.$index, scope.row)">删除</el-button> -->
                       </template>
                   </el-table-column>
             </el-table>
@@ -324,11 +324,6 @@
 
       </el-dialog>
 
-
-
-
-
-
     </div>
 </template>
 
@@ -340,7 +335,8 @@
       SaveHousingestate, 
       FindAreas, 
       FindHousingestate, 
-      UpdateHousingestate, } from "../../../../api/api.js";
+      UpdateHousingestate, 
+      SaveBuilding, } from "../../../../api/api.js";
 
     export default {
         name: 'District',
@@ -375,6 +371,7 @@
                 add_formData: {},
                 add_state: '启用',
                 add_visible: false,
+
                 // 删除
                 del_visible : false,
                 // 编辑

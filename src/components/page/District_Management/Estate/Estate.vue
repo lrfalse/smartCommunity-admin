@@ -376,8 +376,9 @@
             })
           },
           //翻页
-          handleCurrentChange(){
-            console.log('翻页')
+          handleCurrentChange(page){
+            // this.page = page
+            console.log(page)
           },
           // 添加提交
           submit_add(){
