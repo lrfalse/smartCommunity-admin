@@ -15,8 +15,7 @@
             
               <el-form-item label="公司状态">
                   <el-select 
-                      v-model="state_option[1].value"   
-                      disabled
+                      v-model="search.isValid"   
                       placeholder="全部">
                     <el-option
                         v-for="item in state_option"
@@ -70,6 +69,7 @@
                   <el-table-column     
                       label="公司状态" 
                       prop="isValid" 
+                      :formatter="formatterisValid"
                       width="80" 
                       align="center">
                   </el-table-column>
@@ -150,7 +150,7 @@
               </el-form-item>
               <el-form-item label="小区状态">
                   <el-select 
-                      v-model="state_option[1].label"  
+                      v-model="add_formData.isValid"  
                       disabled 
                       no-data-text="启用"
                       placeholder="全部">
@@ -195,7 +195,7 @@
 
   <!-- 编辑 -->
 
-    <el-dialog title="添加用户" :visible.sync="updata_visible" width="40%">
+    <el-dialog title="编辑用户" :visible.sync="updata_visible" width="40%">
         
          <el-form 
            :model="updata_form" 
@@ -239,8 +239,7 @@
               </el-form-item>
               <el-form-item label="小区状态">
                   <el-select 
-                      v-model="state_option[1].label"  
-                      disabled 
+                      v-model="updata_form.isValid"  
                       no-data-text="启用"
                       placeholder="全部">
                     <el-option
@@ -291,17 +290,19 @@
                 // 状态选择  
                 state_option: [
                   {
-                    label: '禁用',
+                    label: '启用',
                     value: 0,
                     
                   },{
-                    label: '启用',
+                    label: '禁用',
                     value: 1,
                   },
                 ],
 
                 // 添加
-                add_formData: {},
+                add_formData: {
+                  isValid: 0,
+                },
                 add_state: '启用',
                 add_visible: false,
 
@@ -351,44 +352,31 @@
             this.formData = []
             let params = {
               propertyName : this.search.name,
+              isValid: this.search.isValid,
               page: 1,
             };
             FindPropertyCompanys(params).then(data=>{     
-                console.log(data)     
+                   
                 this.formData = JSON.parse(data.body).list
-                this.formData.map(x=>{
-                  x.isValid ? x.isValid = '启用' : x.isValid = '禁用';
-                })
+                // console.log(this.formData)  
             })
           },
           // 获取物业公司列表
-          FindPropertyCompanysApi(){
-            let params = {
-              page: 1,
-            };
-            FindPropertyCompanys(params).then(data=>{     
-                console.log(data)     
+          FindPropertyCompanysApi(pages){
+            FindPropertyCompanys({page: pages}).then(data=>{     
+                // console.log(data)     
                 this.formData = JSON.parse(data.body).list
-                this.formData.map(x=>{
-                  x.isValid ? x.isValid = '启用' : x.isValid = '禁用';
-                })
-                console.log(this.formData) 
+                console.log(this.formData)
             })
           },
-          //翻页
-          handleCurrentChange(page){
-            // this.page = page
-            console.log(page)
+          //翻页s
+          handleCurrentChange(pages){
+            this.FindPropertyCompanysApi(pages)
           },
           // 添加提交
           submit_add(){
             this.$refs['ruleForm'].validate((valid) => {
                 if (valid) {  
-
-                      this.$set(this.add_formData, 'isValid', 1)
-                      console.log(this.add_formData.isValid)
-                      
-                      // this.formData.push(this.add_formData)
 
                       SaveProperty(this.add_formData).then(data=>{
                         console.log(data)
@@ -457,11 +445,6 @@
           save_add(){
             this.$refs['ruleForm'].validate((valid) => {
                   if (valid) {          
-                    this.updata_form.isValid == '启用' ?
-                    this.updata_form.isValid = 1 : 
-                    this.updata_form.isValid = 0
- // == '启用' ? item.isValid = 1 : item.isValid = 0
-
 
                     UpdateProperty(this.updata_form).then(data=>{
                       if(data.statusCode === '000'){
@@ -492,6 +475,9 @@
                   this.updata_visible = false
                 });
           },   
+          formatterisValid(row){
+             return row.isValid == '0' ? '启用' : '禁用';
+          },
 
           // 重置   searchForm
            resetSearc() {

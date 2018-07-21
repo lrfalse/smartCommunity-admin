@@ -25,6 +25,8 @@
 </template>
 <script>
     import bus from '../common/bus';
+    import { Logout } from '../../api/api.js'
+
     export default {
         data() {
             return {
@@ -41,8 +43,14 @@
             // 用户名下拉菜单选择事件
             handleCommand(command) {
                 if(command == 'loginout'){
+                    let phone = localStorage.getItem('ms_username')
+                    Logout({phone:phone}).then(data=>{
+                        this.$message.success('退出成功')
+                    });
+
                     localStorage.removeItem('ms_username')
                     this.$router.push('/login');
+                 
                 }
             },
             // 侧边栏折叠

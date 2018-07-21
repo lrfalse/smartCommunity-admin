@@ -46,7 +46,6 @@
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
                 </div>
-                <!-- <p style="font-size:12px;line-height:30px;color:#999;">Tips : 用户名和密码随便填。</p> -->
             </el-form>
         </div>
     </div>
@@ -85,8 +84,8 @@
                         { min: 6, message: '密码长度最少6位', trigger: 'blur' },
                     ],
                     code: [
-                        { required: true, message: '请输入验证码', trigger: 'blur' },
-                        { validator: validatorCode, trigger: 'blur' }
+                        // { required: true, message: '请输入验证码', trigger: 'blur' },
+                        { validator: validatorCode, trigger: 'submit' }
                         
                     ]
                 },
@@ -103,9 +102,9 @@
         },
         methods: {
             submitForm(formName) {    
-                    localStorage.setItem('ms_username',this.ruleForm.username);
-                    this.$router.push('/');
-                    return
+                    // localStorage.setItem('ms_username',this.ruleForm.username);
+                    // this.$router.push('/');
+                    // return
                 // let form = document.getElementById('form')
                 // let formData = new FormData(form)
 
@@ -118,27 +117,31 @@
                             name: this.ruleForm.username,
                             pwd: md5.digest('hex')                             
                           };
-                            console.log(params)
                         Login(params).then(data=>{
-                            console.log(data)
-                            if (data.statusCode !== '000') {
+                            if (data.statusCode === '000') {
+                                let obj = JSON.parse(data.body).mobPhone
+                                console.log(obj)
+                                this.$message.success('登陆成功');
+                                localStorage.setItem('ms_username',obj);
+                                this.$router.push('/');
+                            }else{
+                                
                                 this.$message.error('用户名或密码错误');
                                 this.resetForm()
-                            }else{
-                                // localStorage.setItem('ms_username',this.ruleForm.username);
-                                // this.$router.push('/');
                             }
                         });
                         
                     } else {
-                        console.log('error submit!!');
+                        // this.$message.error('用户名或密码错误');
                         return false;
                     };
+
                 });
             },
             //重置输入框
             resetForm() {
-                this.$refs.formName.resetFields();
+                this.$refs['ruleForm'].resetFields();
+                this.createCode()
             },
 
           //图片验证码

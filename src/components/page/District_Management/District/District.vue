@@ -9,6 +9,7 @@
             <el-form-item label="物业公司">
                 <el-select 
                     v-model="search.propertyId"   
+                    @change="get_pro"
                     placeholder="全部">
                   <el-option
                       v-for="item in company_option"
@@ -20,14 +21,21 @@
             </el-form-item>
 
             <el-form-item label="小区名称">
-              <el-input 
-                  v-model="search.name" 
-                  placeholder="请输入小区名称"></el-input>
+                <el-select 
+                    v-model="search.name"   
+                    placeholder="全部">
+                  <el-option
+                      v-for="item in distict_option"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.label">
+                  </el-option>
+                </el-select>
             </el-form-item>
+
             <el-form-item label="小区状态">
                 <el-select 
-                    v-model="state_option[1].value"   
-                    disabled 
+                    v-model="search.isValid"   
                     placeholder="全部">
                   <el-option
                       v-for="item in state_option"
@@ -88,6 +96,7 @@
                     label="小区状态" 
                     prop="isValid" 
                     width="80" 
+                    :formatter="formatterisValid"
                     align="center">
                 </el-table-column>
                 <el-table-column 
@@ -294,8 +303,7 @@
             </el-form-item>
             <el-form-item label="小区状态">
                 <el-select 
-                    v-model="updata_form.state"   
-                    disabled 
+                    v-model="updata_form.isValid"   
                     placeholder="启用">
                   <el-option
                       v-for="item in state_option"
@@ -348,11 +356,11 @@
                 // 状态选择  
                 state_option: [
                   {
-                    label: '禁用',
+                    label: '启用',
                     value: 0,
                     
                   },{
-                    label: '启用',
+                    label: '禁用',
                     value: 1,
                   },
                 ],
@@ -363,10 +371,6 @@
                 city_options: [],
                 city_selected: [],
                 city_name: [],
-                sss: {
-                  label:1,
-                  label:2,
-                },
                 // 添加
                 add_formData: {},
                 add_state: '启用',
@@ -380,6 +384,9 @@
                 updata_item: {},
                 // 单行索引
                 rowIndex: -1,
+
+                // 小区
+                distict_option: [],
 
                 // 验证规则
                 rules: {
@@ -420,6 +427,22 @@
           },
         },
         methods: {
+          // 获取小区值
+          get_pro(val){
+            // search.name
+            this.distict_option = [];
+            FindHousingestate({propertyId: val}).then(data=>{
+              let obj = JSON.parse(data.body).list
+              for(let i of obj){
+                this.distict_option.push({
+                  label: i.name, 
+                  value: i.id,
+                })
+              }
+            })
+  
+          },
+
           handleChange_updata(){
             console.log(1)
           },
@@ -428,24 +451,17 @@
             FindHousingestate(this.search).then(data=>{
               if(data.statusCode === '000'){
                 this.formData = JSON.parse(data.body).list
-                this.formData.map(x=>{
-                  x.isValid ? x.isValid = '启用' : x.isValid = '禁用';
-                })
               }
             })
           }, 
           // 获取小区信息
-          FindHousingestateApi(){
-            FindHousingestate().then(data=>{
-              console.log(data)
+          FindHousingestateApi(pages){
+            FindHousingestate({page: pages}).then(data=>{
+              
               if(data.statusCode === '000'){
                 this.formData = JSON.parse(data.body).list
-                this.formData.map(x=>{
-                  x.isValid ? x.isValid = '启用' : x.isValid = '禁用';
-                })
-                
+                console.log(this.formData)
               }else{
-                console.log(data)
                 this.$message({
                     type: 'error',
                     message: data.statusMsg,
@@ -541,8 +557,8 @@
             });
           },
           //翻页
-          handleCurrentChange(){
-            console.log('翻页')
+          handleCurrentChange(pages){
+            this.FindHousingestateApi(pages)
           },
           // 添加提交
           submit_add(){
@@ -570,7 +586,6 @@
                         };
 
                       SaveHousingestate(params).then(data=>{
-                        console.log(data)
                         if(data.statusCode === '000'){
                           this.$message({
                               type: 'success',
@@ -636,6 +651,7 @@
               phone : item.phone,  //是 联系电话
               contacts : item.contacts,   //是 联系人
               city_name: [item.provincesName, item.cityName, item.areasName],
+              isValid: parseInt(item.isValid), 
               id: item.id,
             };
 
@@ -646,7 +662,7 @@
           save_add(){
             this.$refs['ruleForm'].validate((valid) => {
                   if (valid) {          
-                    
+                    console.log(this.updata_form)
                     let propertyName = ''
                     this.company_option.forEach(item=>{
                           if(item.id == this.updata_form.property_id){
@@ -668,6 +684,7 @@
                         name : this.updata_form.name,  //是 小区名称
                         phone : this.updata_form.phone,  //是 联系电话
                         contacts : this.updata_form.contacts,   //是 联系人
+                        isValid: this.updata_form.isValid,
                     };
 
                     UpdateHousingestate(params).then(data=>{
@@ -698,10 +715,13 @@
                   this.updata_visible = false
                 });
           },      
-
+           formatterisValid(row){
+             return row.isValid == '0' ? '启用' : '禁用';
+          },
           // 重置
           resetForm(){
-             this.search = {}
+             this.search = {};
+             this.FindHousingestateApi()
           },
            
         },

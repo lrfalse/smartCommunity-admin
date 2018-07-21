@@ -1,6 +1,6 @@
 <template>
     <div class="Page">
-       <div class="search container">
+          <div class="search container">
            <el-form 
             :inline="true" 
             :model="search" 
@@ -9,6 +9,7 @@
             <el-form-item label="物业公司">
                 <el-select 
                     v-model="search.propertyId"   
+                    @change="get_pro"
                     placeholder="全部">
                   <el-option
                       v-for="item in company_option"
@@ -24,18 +25,17 @@
                     v-model="search.housingEstateId"   
                     placeholder="全部">
                   <el-option
-                      v-for="item in district_option"
-                      :key="item.housingEstateId"
-                      :label="item.housingEstateName"
-                      :value="item.housingEstateId">
+                      v-for="item in distict_option"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
                   </el-option>
                 </el-select>
             </el-form-item>
 
             <el-form-item label="楼栋状态">
                 <el-select 
-                    v-model="state_option[1].value"   
-                    disabled 
+                    v-model="search.isValid"   
                     placeholder="全部">
                   <el-option
                       v-for="item in state_option"
@@ -84,6 +84,7 @@
                 <el-table-column     
                     label="小区状态" 
                     prop="isValid" 
+                    :formatter="formatState"
                     width="80" 
                     align="center">
                 </el-table-column>
@@ -131,9 +132,9 @@
          ref="ruleForm" 
          label-width="100px" 
          class="demo-ruleForm">
-            <el-form-item label="物业公司" prop="property_id">
+            <el-form-item label="物业公司" prop="propertyId">
                 <el-select 
-                    v-model="add_formData.property_id"   
+                    v-model="add_formData.propertyId"   
                     @change="estate_changed"     
                     placeholder="全部">
                   <el-option
@@ -148,7 +149,7 @@
             <el-form-item label="小区名称" prop="housingEstateId">
                 <el-select 
                     v-model="add_formData.housingEstateId"   
-                    @change="district_changed" 
+                    
                     placeholder="全部">
                   <el-option
                       v-for="item in district_option"
@@ -170,7 +171,7 @@
 
             <el-form-item label="楼栋状态">
                 <el-select 
-                    v-model="state_option[1].value"   
+                    v-model="add_formData.isValid"   
                     disabled 
                     placeholder="全部">
                   <el-option
@@ -213,7 +214,7 @@
 
   <!-- 编辑 -->
 
-    <el-dialog title="添加小区" :visible.sync="updata_visible" width="40%">
+    <el-dialog title="编辑小区" :visible.sync="updata_visible" width="40%">
         
          <el-form 
          :model="updata_form" 
@@ -223,9 +224,9 @@
          label-width="100px" 
          class="demo-ruleForm">
 
-          <el-form-item label="物业公司" prop="property_id">
+          <el-form-item label="物业公司" prop="propertyId">
                 <el-select 
-                    v-model="updata_form.property_id"   
+                    v-model="updata_form.propertyId"   
                     @change="estate_changed"     
                     placeholder="全部">
                   <el-option
@@ -239,8 +240,7 @@
 
             <el-form-item label="小区名称" prop="housingEstateId">
                 <el-select 
-                    v-model="updata_form.housingEstateId"   
-                    @change="district_changed" 
+                    v-model="updata_form.housingEstateId"            
                     placeholder="全部">
                   <el-option
                       v-for="item in district_option"
@@ -262,8 +262,7 @@
 
             <el-form-item label="楼栋状态">
                 <el-select 
-                    v-model="state_option[1].value"   
-                    disabled 
+                    v-model="updata_form.isValid"   
                     placeholder="全部">
                   <el-option
                       v-for="item in state_option"
@@ -313,11 +312,11 @@
                 // 状态选择  
                 state_option: [
                   {
-                    label: '禁用',
+                    label: '启用',
                     value: 0,
                     
                   },{
-                    label: '启用',
+                    label: '禁用',
                     value: 1,
                   },
                 ],
@@ -331,12 +330,10 @@
                 city_options: [],
                 city_selected: [],
                 city_name: [],
-                sss: {
-                  label:1,
-                  label:2,
-                },
                 // 添加
-                add_formData: {},
+                add_formData: {
+                  isValid: 0,
+                },
                 add_state: '启用',
                 add_visible: false,
 
@@ -349,9 +346,12 @@
                 // 单行索引
                 rowIndex: -1,
 
+                // 小区 数组
+                distict_option: [],
+
                 // 验证规则
                 rules: {
-                    property_id: { required: true, message: '请选择物业公司', trigger: 'change' },
+                    propertyId: { required: true, message: '请选择物业公司', trigger: 'change' },
                     housingEstateId: { required: true, message: '请输入小区名称', trigger: 'change' },
                     name: { required: true, message: '请输入楼栋名称', trigger: 'blur' },
                 },
@@ -369,15 +369,37 @@
           },
         },
         methods: {
+          // 获取小区值
+          get_pro(val){
+            this.distict_option = [];
+            FindHousingestate({propertyId: val}).then(data=>{
+              let obj = JSON.parse(data.body).list
+              for(let i of obj){
+                this.distict_option.push({
+                  label: i.name, 
+                  value: i.id,
+                })
+              }
+            })
+  
+          },
+
+          // 查询
+          searchFn(){
+            FindHousingestate(this.search).then(data=>{
+              if(data.statusCode === '000'){
+                this.formData = JSON.parse(data.body).list
+              }
+            })
+          },
+
+
+
+
+
           // 获取小区名
           district_changed(val){
-            this.district_option.forEach(x=>{
-              if(x.housingEstateId == val){
-                this.district_name = x.housingEstateName
-                console.log(this.district_name)
-              };
-              
-            })
+            
 
           },
           // 获取物业公司名
@@ -386,7 +408,7 @@
             this.company_option.forEach(x=>{
               if(x.id == val){
                 this.propertyName = x.propertyName
-                console.log(this.propertyName)
+                // console.log(this.propertyName)
               };
 
             })
@@ -396,13 +418,14 @@
           },
           // 查询
           searchFn(){
-            console.log(this.search)
-            this.FindBuildingApi(this.search)
+            FindBuilding(this.search).then(data=>{
+              this.formData = JSON.parse(data.body).list
+            })
 
           }, 
           // 获取楼栋信息
-          FindBuildingApi(params){
-            FindBuilding(params).then(data=>{
+          FindBuildingApi(pages){
+            FindBuilding({page: pages}).then(data=>{
               // console.log(data)
               if(data.statusCode === '000'){
                  this.formData = JSON.parse(data.body).list
@@ -432,8 +455,6 @@
                 for(let i of map.values()){
                   this.district_option.push(i)
                 };
-
-                console.log(this.district_option)
                 
               }else{
                 this.$message({
@@ -464,19 +485,19 @@
               for(let i of map.values()){
                 this.company_option.push(i)
               };
-              console.log(this.company_option)
+              
             });
           },
           //翻页
-          handleCurrentChange(value){
-            console.log(value)
+          handleCurrentChange(pages){
+            this.FindBuildingApi(pages)
           },
           // 添加提交
           submit_add(){
             this.$refs['ruleForm'].validate((valid) => {
                 if (valid) {               
                     let params = {
-                         propertyId:  this.add_formData.property_id,  //是 物业公司id
+                         propertyId:  this.add_formData.propertyId,  //是 物业公司id
                          propertyName: this.propertyName,    //是 物业公司名称
                          housingEstateId: this.add_formData.housingEstateId,   //是 小区id
                          housingEstateName: this.district_name,   //是 小区名称
@@ -532,13 +553,15 @@
           // 编辑z
           edit_dialog(index, row){
             this.rowIndex = index
+            
             const item = this.formData[index]
 
             this.updata_form = {
-              property_id : item.propertyId,   //是 物业公司id
-              propertyName :  item.propertyName,  //是 物业公司名称
+              propertyId : item.propertyId,   //是 物业公司id ``
               housingEstateId : item.housingEstateId,  //是 小区名称
+              housingEstateName: item.housingEstateName, //是 小区名称 ```
               name: item.name, //楼栋名称
+              isValid: parseInt(item.isValid),
               id: item.id,
             };
 
@@ -550,6 +573,16 @@
           save_add(){
             this.$refs['ruleForm'].validate((valid) => {
                   if (valid) {          
+                    this.company_option.forEach(x=>{
+                        if(x.id == this.updata_form.propertyId){
+                          this.updata_form.propertyName = x.propertyName
+                        };
+                    });
+                    this.district_option.forEach(x=>{
+                        if(x.housingEstateId == this.updata_form.housingEstateId){
+                          this.updata_form.housingEstateName = x.housingEstateName
+                        };
+                    });
                     
 
                     UpdateBuilding(this.updata_form).then(data=>{
@@ -580,6 +613,9 @@
                   this.updata_visible = false
                 });
           },      
+          formatState(row){
+            return row.isValid == '0' ? '启用' : '禁用';
+          },
 
           // 重置
           resetForm(){
