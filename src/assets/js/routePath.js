@@ -25,6 +25,14 @@ const routePath = [
                     title: '房号与住户管理',
                 },
             ]
+        },{
+            icon: 'el-icon-setting',
+            index: 'admin',
+            title: '用户管理',
+        },{
+            icon: 'el-icon-setting',
+            index: 'Equipment',
+            title: '设备管理',
         },
         
 	]

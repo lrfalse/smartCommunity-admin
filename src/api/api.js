@@ -4,8 +4,8 @@ import router from '../router/index.js'
 
 // this.$indicator.open();
 
-// axios.defaults.baseURL= 'http://192.168.0.101:18080';
-axios.defaults.baseURL= 'http://120.79.222.9:18080';
+axios.defaults.baseURL= 'http://192.168.0.101:18080';
+// axios.defaults.baseURL= 'http://120.79.222.9:18080';
 // axios.defaults.headers['Content-Type'] = "application/json;charset=UTF-8";
    // axios.defaults.baseURL= ENV.baseURL;
 axios.defaults.withCredentials = false    // 携带cookie
@@ -51,9 +51,9 @@ axios.interceptors.response.use(
 export const Login = params => { return axios.post('/login',params).then(res => res.data);};
 // 退出登陆
 export const Logout = params => { return axios.post('/logout',params).then(res => res.data);};
+// 修改密码 
+export const UpdateSysUserPwd = params => { return axios.post('/updateSysUserPwd',params).then(res => res.data);};
 
-//新增系统用户
-export const AddSysUser = params => { return axios.post('/addSysUser',params).then(res => res.data);};
 // 新增物业信息接口
 export const SaveProperty = params => { return axios.post('/saveProperty',params).then(res => res.data);};
 // 	获取物业公司列表 / 查询
@@ -95,3 +95,17 @@ export const FindMember = params => { return axios.post('/findMember',params).th
 export const SaveMember = params => { return axios.post('/saveMember',params).then(res => res.data);};
 // 编辑 业主
 export const UpdateMember = params => { return axios.post('/updateMember',params).then(res => res.data);};
+
+// 获取用户信息
+export const FindSysUser = params => { return axios.post('/findSysUser',params).then(res => res.data);};
+// 新增用户
+export const AddSysUser = params => { return axios.post('/addSysUser',params).then(res => res.data);};
+// 编辑用户
+export const UpdateSysUser = params => { return axios.post('/updateSysUser',params).then(res => res.data);};
+
+// 查询设备
+export const FindGatDerviceInventory = params => { return axios.post('/findGatDerviceInventory',params).then(res => res.data);};
+// 添加 设备
+export const SaveGatDerviceInventory = params => { return axios.post('/saveGatDerviceInventory',params).then(res => res.data);};
+//修改设备
+export const UpdateGatDerviceInventory = params => { return axios.post('/updateGatDerviceInventory',params).then(res => res.data);};

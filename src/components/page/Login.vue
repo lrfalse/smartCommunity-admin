@@ -102,12 +102,6 @@
         },
         methods: {
             submitForm(formName) {    
-                    // localStorage.setItem('ms_username',this.ruleForm.username);
-                    // this.$router.push('/');
-                    // return
-                // let form = document.getElementById('form')
-                // let formData = new FormData(form)
-
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         // localStorage.setItem('ms_username',this.ruleForm.username);
@@ -118,11 +112,15 @@
                             pwd: md5.digest('hex')                             
                           };
                         Login(params).then(data=>{
+
                             if (data.statusCode === '000') {
-                                let obj = JSON.parse(data.body).mobPhone
-                                console.log(obj)
+                                let obj = {}
+                                    obj.id = JSON.parse(data.body).id
+                                    obj.name = JSON.parse(data.body).name
+                                // obj.id = JSON.parse(data.body).id
+                                // console.log(JSON.parse(data.body))
                                 this.$message.success('登陆成功');
-                                localStorage.setItem('ms_username',obj);
+                                localStorage.setItem('ms_username',JSON.stringify(obj));
                                 this.$router.push('/');
                             }else{
                                 

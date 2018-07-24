@@ -4,7 +4,7 @@ import Router from 'vue-router';
 Vue.use(Router);
 
 export default new Router({
-    mode: 'history',
+    // mode: 'history',
     routes: [
         {
             path: '/',
@@ -42,6 +42,19 @@ export default new Router({
                     component: resolve => require(['../components/page/District_Management/Household/Household.vue'], resolve),
                     meta: { title: '房号与住户管理' }
                 },
+                // 用户管理
+                {
+                    path: '/admin',
+                    component: resolve => require(['../components/page/User/Admin/Form.vue'], resolve),
+                    meta: { title: '用户管理' }
+                },
+                //设备管理
+                {
+                    path: '/Equipment',
+                    component: resolve => require(['../components/page/Equipment/Form.vue'], resolve),
+                    meta: { title: '设备管理' }
+                },
+
 
             ]
         },
